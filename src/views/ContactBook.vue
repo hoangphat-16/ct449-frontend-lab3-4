@@ -38,6 +38,20 @@
           <i class="fas fa-address-card"></i>
         </h4>
         <ContactCard :contact="activeContact" />
+
+ 
+        <router-link
+          :to="{
+            name: 'contact.edit',
+            params: { id: activeContact._id },
+          }"
+        >
+          
+          <span class="mt-2 badge badge-warning text-dark">
+            <i class="fas fa-edit"></i> Hiệu chỉnh
+          </span>
+        </router-link>
+
       </div>
     </div>
   </div>
@@ -68,21 +82,23 @@ export default {
     },
   },
   computed: {
-
+   
     contactString() {
       return this.contacts.map((contact) => {
         const { name, email, address, phone } = contact;
-        return [name, email, address, phone].join(" ");
+    
+        return [name, email, address, phone].join(" ").toLowerCase();
       });
     },
-   
+
     filteredContacts() {
       if (!this.searchText) {
         return this.contacts;
       }
-     
+ 
+      const searchTextLower = this.searchText.toLowerCase();
       return this.contacts.filter((contact, index) =>
-        this.contactString[index].includes(this.searchText)
+        this.contactString[index].includes(searchTextLower)
       );
     },
     activeContact() {
@@ -108,13 +124,12 @@ export default {
     },
 
     async removeAllContacts() {
-      if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
-        try {
-          await ContactService.deleteAll();
-          this.refreshList();
-        } catch (error) {
-          console.log(error);
-        }
+      
+      try {
+        await ContactService.deleteAll();
+        this.refreshList();
+      } catch (error) {
+        console.log(error);
       }
     },
 
@@ -122,11 +137,14 @@ export default {
       this.$router.push({ name: "contact.add" });
     },
 
-    mounted() {
-      this.refreshList();
-    },
-  },
+    
+    
+  }, 
 
+  
+  mounted() {
+    this.refreshList();
+  },
 };
 </script>
 
@@ -134,5 +152,12 @@ export default {
 .page {
   text-align: left;
   max-width: 750px;
+}
+
+.badge-warning {
+  color: #212529; 
+  cursor: pointer; 
+  font-size: 0.9rem;
+  padding: 0.5em 0.75em;
 }
 </style>
